@@ -1,3 +1,3 @@
 # Movie App
 
-React Js Fundamentals Coulse 
+React Js Fundamentals Course - Nicolas
