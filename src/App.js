@@ -1,50 +1,56 @@
 import React from 'react';
+import axios from 'axios';
+import Movie from "./Movie";
+import "./App.css";
 
 //react는 자동적으로 class component의 render method를 실행한다!
 class App extends React.Component{
 
   state = {
     //변화하는 데이터를 담기 위해 state가 필요하다
-    count: 0,
-    isLoading: true
+    isLoading: true,
+    movies: []
   };
-  add = ( ) => {
-    //console.log("add");
-    this.setState(current => ({count: current.count + 1}));
-  };
-  minus = ( ) => {
-    //console.log("miinus");
-    this.setState(current => ({count: current.count - 1}));
+  getMovies = async () => {
+    const {
+      data: {
+        data: { movies }
+      }
+    } = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
+    //console.log(movies);
+    this.setState({movies ,isLoading: false})
   };
 
   componentDidMount(){
-    //mount 된것을 알려줌
-    console.log("component rendered");
-    setTimeout(() => {
-      this.setState({ isLoading: false});
-    }, 3000);
+    this.getMovies();
   }
-  componentDidUpdate(){
-    //update 된것을 알려줌
-    console.log("i just update");
-  }
-  componentWillUnmount(){
-    //unmount 된것을 알려줌
-    console.log("GoodBye, unmount");
-  }
-
+ 
     //매 순간 setState를 호출할 때마다 react는 새로운 state와 함께 render function을 호출한다.
   render() {
-    console.log("i'm rendering");
-    const {isLoading} =  this.state;
+    const {isLoading, movies} =  this.state;
     return (
-    <div>
-
-      {isLoading ? "Loading...":"We are ready!"}
-      <h1> The number is : {this.state.count}</h1>
-      <button onClick={this.add}>Add</button>
-      <button onClick={this.minus}>Minus</button>
-    </div>
+      <section className="container">
+        {isLoading ? (
+          <div className="loader">
+            <span className="loader__text">Loading...</span>
+          </div>
+        ) : (
+          <div className="movies">
+            {movies.map(movie => (
+              <Movie 
+                key = {movie.id}
+                id = {movie.id} 
+                year = {movie.year} 
+                title = { movie.title} 
+                summary = {movie.summary} 
+                poster = {movie.medium_cover_image} 
+                genres={movie.genres}
+              />
+            ))}
+          </div>
+          )
+        }
+    </section>
     );
   }
 }
